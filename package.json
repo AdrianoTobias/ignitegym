@@ -24,6 +24,7 @@
     "@babel/core": "^7.25.2",
     "@rocketseat/eslint-config": "^2.2.2",
     "@types/react": "~18.3.12",
+    "react-native-svg-transformer": "^1.5.0",
     "typescript": "^5.3.3"
   },
   "private": true
