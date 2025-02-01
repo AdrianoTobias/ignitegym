@@ -2,6 +2,7 @@ import { ScreenHeader } from '@components/ScreenHeader'
 import { UserPhoto } from '@components/UserPhoto'
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
+import { ToastMessage } from '@components/ToastMessage'
 import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
@@ -49,6 +50,14 @@ export function Profile() {
   return (
     <VStack flex={1}>
       <ScreenHeader title="Perfil" />
+
+      <ToastMessage
+        id="1"
+        title="Mensagem de exemplo"
+        description="Descrição de exemplo"
+        action="success"
+        onClose={() => {}}
+      />
 
       <ScrollView contentContainerStyle={{ paddingBottom: 36 }}>
         <Center mt="$6" px="$10">
