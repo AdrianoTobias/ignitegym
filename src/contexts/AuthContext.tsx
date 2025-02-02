@@ -3,6 +3,7 @@ import { createContext, ReactNode, useEffect, useState } from 'react'
 import {
   storageAuthTokenSave,
   storageAuthTokenGet,
+  storageAuthTokenRemove,
 } from '@storage/storageAuthToken'
 import {
   storageUserGet,
@@ -61,6 +62,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
     setUser({} as UserDTO)
     await storageUserRemove()
+    await storageAuthTokenRemove()
 
     setIsLoadingUserStorageData(false)
   }
