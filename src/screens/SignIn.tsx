@@ -23,6 +23,8 @@ import { Button } from '@components/Button'
 import { Controller, useForm } from 'react-hook-form'
 import { ToastMessage } from '@components/ToastMessage'
 
+import { useState } from 'react'
+
 import { AppError } from '@utils/AppError'
 
 type FormDataProps = {
@@ -36,6 +38,8 @@ const signInSchema = yup.object({
 })
 
 export function SignIn() {
+  const [isLoading, setIsLoading] = useState(false)
+
   const { singIn } = useAuth()
 
   const toast = useToast()
@@ -52,6 +56,8 @@ export function SignIn() {
 
   async function handleSignIn({ email, password }: FormDataProps) {
     try {
+      setIsLoading(true)
+
       await singIn(email, password)
     } catch (error) {
       const isAppError = error instanceof AppError
@@ -71,6 +77,8 @@ export function SignIn() {
           />
         ),
       })
+
+      setIsLoading(false)
     }
   }
 
@@ -135,7 +143,11 @@ export function SignIn() {
               )}
             />
 
-            <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
+            <Button
+              title="Acessar"
+              onPress={handleSubmit(handleSignIn)}
+              isLoading={isLoading}
+            />
           </Center>
 
           <Center flex={1} justifyContent="flex-end" marginTop="$4">
