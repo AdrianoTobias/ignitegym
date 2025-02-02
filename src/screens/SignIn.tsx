@@ -12,6 +12,8 @@ import * as yup from 'yup'
 import { useNavigation } from '@react-navigation/native'
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes'
 
+import { useAuth } from '@hooks/useAuth'
+
 import BackgroundImg from '@assets/background.png'
 import Logo from '@assets/logo.svg'
 
@@ -30,6 +32,8 @@ const signInSchema = yup.object({
 })
 
 export function SignIn() {
+  const { singIn } = useAuth()
+
   const {
     control,
     handleSubmit,
@@ -41,7 +45,7 @@ export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>()
 
   function handleSignIn({ email, password }: FormDataProps) {
-    console.log({ email, password })
+    singIn(email, password)
   }
 
   function handleNewAccount() {
