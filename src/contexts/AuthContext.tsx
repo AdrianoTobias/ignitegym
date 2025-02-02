@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
 
+import { storageAuthTokenSave } from '@storage/storageAuthToken'
 import {
   storageUserGet,
   storageUserRemove,
@@ -28,12 +29,23 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<UserDTO>({} as UserDTO)
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true)
 
+  async function storageUserAndToken(userData: UserDTO, token: string) {
+    setIsLoadingUserStorageData(true)
+
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
+
+    await storageUserSave(userData)
+    await storageAuthTokenSave(token)
+    setUser(userData)
+
+    setIsLoadingUserStorageData(false)
+  }
+
   async function singIn(email: string, password: string) {
     const { data } = await api.post('/sessions', { email, password })
 
     if (data.user && data.token) {
-      setUser(data.user)
-      storageUserSave(data.user)
+      storageUserAndToken(data.user, data.token)
     }
   }
 
