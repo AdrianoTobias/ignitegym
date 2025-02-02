@@ -1,6 +1,9 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
 
-import { storageAuthTokenSave } from '@storage/storageAuthToken'
+import {
+  storageAuthTokenSave,
+  storageAuthTokenGet,
+} from '@storage/storageAuthToken'
 import {
   storageUserGet,
   storageUserRemove,
@@ -29,14 +32,17 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<UserDTO>({} as UserDTO)
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true)
 
-  async function storageUserAndToken(userData: UserDTO, token: string) {
-    setIsLoadingUserStorageData(true)
-
+  async function userAndTokenUpdate(userData: UserDTO, token: string) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`
+
+    setUser(userData)
+  }
+
+  async function storageUserAndTokenSave(userData: UserDTO, token: string) {
+    setIsLoadingUserStorageData(true)
 
     await storageUserSave(userData)
     await storageAuthTokenSave(token)
-    setUser(userData)
 
     setIsLoadingUserStorageData(false)
   }
@@ -45,7 +51,8 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     const { data } = await api.post('/sessions', { email, password })
 
     if (data.user && data.token) {
-      storageUserAndToken(data.user, data.token)
+      await storageUserAndTokenSave(data.user, data.token)
+      userAndTokenUpdate(data.user, data.token)
     }
   }
 
@@ -59,10 +66,13 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }
 
   async function loadUserData() {
-    const userLogged = await storageUserGet()
+    setIsLoadingUserStorageData(true)
 
-    if (userLogged) {
-      setUser(userLogged)
+    const userLogged = await storageUserGet()
+    const token = await storageAuthTokenGet()
+
+    if (token && userLogged) {
+      userAndTokenUpdate(userLogged, token)
     }
 
     setIsLoadingUserStorageData(false)
