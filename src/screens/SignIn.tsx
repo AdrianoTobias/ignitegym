@@ -44,8 +44,8 @@ export function SignIn() {
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>()
 
-  function handleSignIn({ email, password }: FormDataProps) {
-    singIn(email, password)
+  async function handleSignIn({ email, password }: FormDataProps) {
+    await singIn(email, password)
   }
 
   function handleNewAccount() {
