@@ -8,6 +8,7 @@ import { UserDTO } from '@dtos/UserDTO'
 export type AuthContextDataProps = {
   user: UserDTO
   singIn: (email: string, password: string) => Promise<void>
+  isLoadingUserStorageData: boolean
 }
 
 type AuthContextProviderProps = {
@@ -20,6 +21,7 @@ export const AuthContext = createContext<AuthContextDataProps>(
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<UserDTO>({} as UserDTO)
+  const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true)
 
   async function singIn(email: string, password: string) {
     const { data } = await api.post('/sessions', { email, password })
@@ -36,6 +38,8 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     if (userLogged) {
       setUser(userLogged)
     }
+
+    setIsLoadingUserStorageData(false)
   }
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, singIn }}>
+    <AuthContext.Provider value={{ user, singIn, isLoadingUserStorageData }}>
       {children}
     </AuthContext.Provider>
   )
