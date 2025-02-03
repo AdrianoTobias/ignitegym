@@ -2,7 +2,7 @@ import { Heading, HStack, Text, useToast, VStack } from '@gluestack-ui/themed'
 import { HomeHeader } from '@components/HomeHeader'
 import { Group } from '@components/Group'
 import { ToastMessage } from '@components/ToastMessage'
-import { ExerciseCard } from './ExerciseCard'
+import { ExerciseCard } from '../components/ExerciseCard'
 
 import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { AppNavigatorRoutesProps } from '@routes/app.routes'
@@ -118,8 +118,8 @@ export function Home() {
         <FlatList
           data={exercises}
           keyExtractor={(item) => item.id}
-          renderItem={() => (
-            <ExerciseCard onPress={handleOpenExerciseDetails} />
+          renderItem={({ item }) => (
+            <ExerciseCard onPress={handleOpenExerciseDetails} data={item} />
           )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}
