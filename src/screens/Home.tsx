@@ -4,25 +4,17 @@ import { Group } from '@components/Group'
 import { ToastMessage } from '@components/ToastMessage'
 import { ExerciseCard } from './ExerciseCard'
 
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { AppNavigatorRoutesProps } from '@routes/app.routes'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { FlatList } from 'react-native'
 
 import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
 
 export function Home() {
-  const [exercises, setExercises] = useState([
-    'Puxada frontal',
-    'Remada curvada',
-    'Remada unilateral',
-    'Crucifixo',
-    'Leg press',
-    'Rosca',
-    'Levantamento terra',
-  ])
+  const [exercises, setExercises] = useState([])
   const [groups, setGroups] = useState<string[]>([])
   const [groupSelected, setGroupSelected] = useState('costas')
 
@@ -58,9 +50,39 @@ export function Home() {
     }
   }
 
+  async function fecthExercisesByGroup() {
+    try {
+      const response = await api.get(`/exercises/bygroup/${groupSelected}`)
+      console.log(response.data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar os exercícios'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            action="error"
+            title={title}
+            onClose={() => toast.close(id)}
+          />
+        ),
+      })
+    }
+  }
+
   useEffect(() => {
     fetchGroups()
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      fecthExercisesByGroup()
+    }, [groupSelected]),
+  )
 
   return (
     <VStack flex={1}>
