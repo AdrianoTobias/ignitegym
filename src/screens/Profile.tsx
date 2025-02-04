@@ -8,6 +8,16 @@ import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native'
 import * as FileSystem from 'expo-file-system'
+import { Controller, useForm } from 'react-hook-form'
+import { useAuth } from '@hooks/useAuth'
+
+type FormDataProps = {
+  name: string
+  email: string
+  password: string
+  old_password: string
+  confirm_password: string
+}
 
 export function Profile() {
   const [userPhoto, setUserPhoto] = useState(
@@ -15,6 +25,14 @@ export function Profile() {
   )
 
   const toast = useToast()
+
+  const { user } = useAuth()
+  const { control } = useForm<FormDataProps>({
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+  })
 
   async function handleUserPhotoSelect() {
     try {
@@ -82,8 +100,31 @@ export function Profile() {
           </TouchableOpacity>
 
           <Center w="$full" gap="$4">
-            <Input placeholder="Nome" bg="$gray600" />
-            <Input value="adriano@email.com" bg="$gray600" isReadOnly />
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  placeholder="Nome"
+                  bg="$gray600"
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  bg="$gray600"
+                  onChangeText={onChange}
+                  value={value}
+                  isReadOnly
+                />
+              )}
+            />
           </Center>
 
           <Heading
