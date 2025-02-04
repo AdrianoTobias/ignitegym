@@ -104,7 +104,15 @@ export function Profile() {
           })
         }
 
-        setUserPhoto(photoSelected.assets[0].uri)
+        const fileExtension = photoUri.split('.').pop()
+
+        const photoFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: photoUri,
+          type: photoSelected.assets[0].mimeType,
+        }
+
+        console.log(photoFile)
       }
     } catch (error) {
       console.log(error)
