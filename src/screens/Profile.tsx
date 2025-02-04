@@ -27,7 +27,7 @@ export function Profile() {
   const toast = useToast()
 
   const { user } = useAuth()
-  const { control } = useForm<FormDataProps>({
+  const { control, handleSubmit } = useForm<FormDataProps>({
     defaultValues: {
       name: user.name,
       email: user.email,
@@ -73,6 +73,10 @@ export function Profile() {
     } catch (error) {
       console.log(error)
     }
+  }
+
+  async function handleProfileUpdate(data: FormDataProps) {
+    console.log(data)
   }
 
   return (
@@ -139,15 +143,52 @@ export function Profile() {
           </Heading>
 
           <Center w="$full" gap="$4">
-            <Input placeholder="Senha atual" bg="$gray600" secureTextEntry />
-            <Input placeholder="Nova senha" bg="$gray600" secureTextEntry />
-            <Input
-              placeholder="Confirme a nova senha"
-              bg="$gray600"
-              secureTextEntry
+            <Controller
+              control={control}
+              name="old_password"
+              render={({ field: { onChange } }) => (
+                <Input
+                  placeholder="Senha atual"
+                  bg="$gray600"
+                  secureTextEntry
+                  onChangeText={onChange}
+                />
+              )}
             />
 
-            <Button title="Atualizar" />
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange } }) => (
+                <Input
+                  placeholder="Nova senha"
+                  bg="$gray600"
+                  secureTextEntry
+                  onChangeText={onChange}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="confirm_password"
+              render={({ field: { onChange } }) => (
+                <Input
+                  placeholder="Confirme a nova senha"
+                  bg="$gray600"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  onSubmitEditing={handleSubmit(handleProfileUpdate)}
+                  returnKeyType="send"
+                />
+              )}
+            />
+
+            <Button
+              title="Atualizar"
+              mt="$4"
+              onPress={handleSubmit(handleProfileUpdate)}
+            />
           </Center>
         </Center>
       </ScrollView>
