@@ -10,14 +10,41 @@ import { ScrollView, TouchableOpacity } from 'react-native'
 import * as FileSystem from 'expo-file-system'
 import { Controller, useForm } from 'react-hook-form'
 import { useAuth } from '@hooks/useAuth'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 type FormDataProps = {
   name: string
   email: string
-  password: string
-  old_password: string
-  confirm_password: string
+  old_password?: string | null
+  password?: string | null
+  confirm_password?: string | null
 }
+
+const profileSchema = yup.object({
+  name: yup.string().required('Informe o nome.'),
+  email: yup.string().email('E-mail inválido.').required('Informe o e-mail.'),
+  old_password: yup
+    .string()
+    .nullable()
+    .transform((value) => value || null)
+    .when('password', ([password], schema) => {
+      return password ? schema.required('Informe a senha atual.') : schema
+    }),
+  password: yup
+    .string()
+    .min(6, 'A senha deve ter pelo menos 6 dígitos.')
+    .nullable()
+    .transform((value) => value || null),
+  confirm_password: yup
+    .string()
+    .nullable()
+    .transform((value) => value || null)
+    .oneOf([yup.ref('password'), null], 'A confirmação de senha não confere.')
+    .when('password', ([password], schema) =>
+      password ? schema.required('Informe a confirmação da senha.') : schema,
+    ),
+})
 
 export function Profile() {
   const [userPhoto, setUserPhoto] = useState(
@@ -27,11 +54,16 @@ export function Profile() {
   const toast = useToast()
 
   const { user } = useAuth()
-  const { control, handleSubmit } = useForm<FormDataProps>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
     defaultValues: {
       name: user.name,
       email: user.email,
     },
+    resolver: yupResolver(profileSchema),
   })
 
   async function handleUserPhotoSelect() {
@@ -113,6 +145,7 @@ export function Profile() {
                   bg="$gray600"
                   onChangeText={onChange}
                   value={value}
+                  errorMessage={errors.name?.message}
                 />
               )}
             />
@@ -152,6 +185,7 @@ export function Profile() {
                   bg="$gray600"
                   secureTextEntry
                   onChangeText={onChange}
+                  errorMessage={errors.old_password?.message}
                 />
               )}
             />
@@ -165,6 +199,7 @@ export function Profile() {
                   bg="$gray600"
                   secureTextEntry
                   onChangeText={onChange}
+                  errorMessage={errors.password?.message}
                 />
               )}
             />
@@ -180,6 +215,7 @@ export function Profile() {
                   onChangeText={onChange}
                   onSubmitEditing={handleSubmit(handleProfileUpdate)}
                   returnKeyType="send"
+                  errorMessage={errors.confirm_password?.message}
                 />
               )}
             />
